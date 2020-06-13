@@ -1,7 +1,12 @@
 {
-    "list": [{ "from": "",
-    "to": "https://github.com/desferreira"},
-    { "from": "diego",
-        "to": "https://www.google.com/?client=safari"}
-]
+    "list": [
+        {
+        "from": "",
+        "to": "https://www.google.com/?client=safari"
+        },
+        {
+        "from": "diego",
+        "to": "https://github.com/desferreira"
+        }
+    ]
 }

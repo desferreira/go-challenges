@@ -1,0 +1,5 @@
+redirects:
+  - from: 
+    to: https://www.google.com/?client=safari
+  - from: diego
+    to: https://github.com/desferreira
