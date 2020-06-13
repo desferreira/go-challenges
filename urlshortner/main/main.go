@@ -1,11 +1,13 @@
 package main
 
 import (
-	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 type Redirect struct {
@@ -17,7 +19,18 @@ type RedirectList struct {
 	Redirects []Redirect `json:"list"`
 }
 
+type RedirectYAML struct {
+	From string `yaml:"from"`
+	To   string `yaml:"to"`
+}
+
+var config string
+
 func main() {
+
+	flag.StringVar(&config, "type", "json", "Type of config file")
+	flag.Parse()
+
 	http.HandleFunc("/", handle)
 
 	err := http.ListenAndServe(":9000", nil)
@@ -27,15 +40,35 @@ func main() {
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
-	redirects := parserJSONMap()
-	fmt.Println(r.URL.Path[1:])
-	fmt.Println(strings.TrimSpace(r.URL.Path[1:]))
-	fmt.Println(redirects[strings.TrimSpace(r.URL.Path[1:])])
+	redirects := parserMap(config)
 	http.Redirect(w, r, redirects[strings.TrimSpace(r.URL.Path[1:])], 301)
 }
 
-func parserJSONMap() map[string]string {
-	jsonMapFile, err := ioutil.ReadFile("../config/map.json")
+func parserMap(config string) map[string]string {
+
+	switch config {
+	case "json":
+		fmt.Println("json")
+		jsonMapFile, err := ioutil.ReadFile("../config/map.json")
+		if err != nil {
+			fmt.Printf("Failed to open %v \n", err)
+		}
+		return JSONtoRedirect(jsonMapFile)
+	case "yaml":
+		fmt.Println("yaml")
+		jsonMapFile, err := ioutil.ReadFile("../config/map.yaml")
+		if err != nil {
+			fmt.Printf("Failed to open %v \n", err)
+		}
+		return YAMLtoRedirect(jsonMapFile)
+	default:
+		fmt.Println("nada")
+		return make(map[string]string)
+	}
+}
+
+func parserYAMLMap() map[string]string {
+	jsonMapFile, err := ioutil.ReadFile("../config/map.yaml")
 	if err != nil {
 		fmt.Printf("Failed to open %v \n", err)
 	}
@@ -44,10 +77,23 @@ func parserJSONMap() map[string]string {
 
 }
 
+func YAMLtoRedirect(jsonData []byte) map[string]string {
+
+	var redirects []RedirectYAML
+	yaml.Unmarshal(jsonData, &redirects)
+
+	mapa := make(map[string]string)
+
+	for _, v := range redirects {
+		mapa[v.From] = v.To
+	}
+	return mapa
+}
+
 func JSONtoRedirect(jsonData []byte) map[string]string {
 
 	var redirects RedirectList
-	json.Unmarshal(jsonData, &redirects)
+	yaml.Unmarshal(jsonData, &redirects)
 
 	mapa := make(map[string]string)
 
