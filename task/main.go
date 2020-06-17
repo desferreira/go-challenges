@@ -15,6 +15,9 @@ func main() {
 	must(cmd.RootCmd.Execute())
 }
 
+/*
+Handle errors in application
+*/
 func must(err error) {
 	if err != nil {
 		fmt.Println(err.Error())

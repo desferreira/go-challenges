@@ -46,7 +46,40 @@ func CreateTask(task string) (int, error) {
 	if err != nil {
 		return -1, err
 	}
-	return id, err
+	return id, nil
+}
+
+/*
+Return all stored tasks
+*/
+func AllTasks() ([]Task, error) {
+	var tasks []Task
+	_ = db.View(func(tx *bolt.Tx) error {
+		b := tx.Bucket(tasksBucket)
+		c := b.Cursor()
+		for k, v := c.First(); k != nil; k, v = c.Next() {
+			task := Task{btoi(k), string(v)}
+			tasks = append(tasks, task)
+		}
+		return nil
+	})
+	return tasks, nil
+}
+
+/*
+Remove a task from the list
+*/
+func DeleteTask(num int) error {
+
+	_ = db.Update(func(tx *bolt.Tx) error {
+		b := tx.Bucket(tasksBucket)
+		err := b.Delete(iotb(num))
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	return nil
 }
 
 /*
