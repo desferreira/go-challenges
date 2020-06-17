@@ -1,7 +1,23 @@
 package main
 
-import "github.com/desferreira/go-challenges/task/cmd"
+import (
+	"fmt"
+	"os"
+	"path/filepath"
+
+	"github.com/desferreira/go-challenges/task/cmd"
+	"github.com/desferreira/go-challenges/task/db"
+)
 
 func main() {
-	cmd.RootCmd.Execute()
+	dbPath := filepath.Join("./", "tasks.db")
+	must(db.Init(dbPath))
+	must(cmd.RootCmd.Execute())
+}
+
+func must(err error) {
+	if err != nil {
+		fmt.Println(err.Error())
+		os.Exit(1)
+	}
 }
