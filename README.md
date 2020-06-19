@@ -6,3 +6,4 @@
 - A simple URL redirect/shortner program that can be configured with a JSON file
 - A simple html parser that search for <a href=""...>
 - A simple todo list on the terminal
+- A simple file rename tool that matches a pattern
